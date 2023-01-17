@@ -1,34 +1,33 @@
-"use strict";
-// ******************************************************** 2. index.js ********************************************************
+import "./style.css";
+
+import { getRandomNum } from "./functions/rand";
+import { Mino, Position2d, Tetris } from "./Tetris";
+
 // ミノを構成する一つのブロックのサイズ
-const blockSize = 30;
+export const blockSize = 30;
 
 // テトロミノのサイズ
-const tetroSize = 4;
-
-// ゲームが開始しているかどうか
-let gameStart = false;
+export const tetroSize = 4;
 
 // 画面の準備 ----------------------------------------------------------------
 
-const canvas = document.getElementById("canvas");
-// @ts-expect-error TS(2531): Object is possibly 'null'.
-const ctx = canvas.getContext("2d");
+export const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
-const fieldCol = 10;
-const fieldRow = 20;
+export const ctx = canvas.getContext("2d")!;
 
-// @ts-expect-error TS(2531): Object is possibly 'null'.
+export const fieldCol = 10;
+export const fieldRow = 20;
+
 canvas.width = blockSize * fieldCol;
-// @ts-expect-error TS(2531): Object is possibly 'null'.
 canvas.height = blockSize * fieldRow;
 
-const body = document.querySelector("body");
+export const body = document.querySelector("body");
 
 //背景画像
-const bgImgContainer = document.getElementById("bg-img-container");
+const bgImgContainer = document.getElementById(
+  "bg-img-container"
+) as HTMLElement;
 
-// @ts-expect-error TS(2531): Object is possibly 'null'.
 bgImgContainer.style.minHeight = "100vh";
 
 const backgroundImage = [
@@ -44,45 +43,34 @@ const backgroundImage = [
   "https://www.pakutaso.com/shared/img/thumb/kuchikomi832_TP_V.jpg",
 ];
 
-// @ts-expect-error TS(2531): Object is possibly 'null'.
 bgImgContainer.style.backgroundImage = `url(${
   backgroundImage[getRandomNum(0, backgroundImage.length - 1)]
 })`;
 
 // 次のミノの表示画面
-const next = document.getElementById("next");
-// @ts-expect-error TS(2531): Object is possibly 'null'.
-const ntx = next.getContext("2d");
+export const next = document.getElementById("next") as HTMLCanvasElement;
+export const ntx = next.getContext("2d")!;
 
-// @ts-expect-error TS(2531): Object is possibly 'null'.
 next.width = blockSize * 4;
-// @ts-expect-error TS(2531): Object is possibly 'null'.
 next.height = blockSize * 4;
 
-let score = 0;
-const scoreView = document.getElementById("score");
-// @ts-expect-error TS(2531): Object is possibly 'null'.
+export const scoreView = document.getElementById("score") as HTMLElement;
 scoreView.innerText = `SCORE : ${score} P`;
 
 // ホールド画面の表示
-const holdView = document.getElementById("hold");
-// @ts-expect-error TS(2531): Object is possibly 'null'.
-const htx = holdView.getContext("2d");
-const baka = document.getElementById("baka");
+export const holdView = document.getElementById("hold") as HTMLCanvasElement;
+export const htx = holdView.getContext("2d")!;
+export const baka = document.getElementById("baka")!;
 
-// @ts-expect-error TS(2531): Object is possibly 'null'.
 holdView.width = blockSize * 4;
-// @ts-expect-error TS(2531): Object is possibly 'null'.
 holdView.height = blockSize * 4;
 
 // フィールドの色関連
 const fieldColor = "rgba(206, 230, 163, 0.8)";
-// @ts-expect-error TS(2531): Object is possibly 'null'.
 canvas.style.backgroundColor = fieldColor;
-// @ts-expect-error TS(2531): Object is possibly 'null'.
 canvas.style.outline = "4px solid #555";
 
-const tetroColors = [
+export const tetroColors = [
   fieldColor,
   "green",
   "yellow",
@@ -96,26 +84,8 @@ const tetroColors = [
   "limegreen",
 ];
 
-// フィールドの宣言
-let field = [];
-
-// ゲームオーバーフラグ
-let gameOver = false;
-
-// 現在ホールドしているかどうか
-let hold = false;
-
-// ホールドしているテトリミノ
-let holdTetro;
-
-// ホールドしているテトリミノのタイプ
-let holdType;
-
-//ホールドして良いかどうか
-let toggleHold = true;
-
 // テトロミノの宣言
-const tetroTypes = [
+export const tetroTypes = [
   [], //0, 空っぽ -> 着地点用
   [
     //1, I
@@ -168,53 +138,44 @@ const tetroTypes = [
   ],
 
   [
+    //8, 四つ角
     [1, 0, 0, 1],
     [0, 0, 0, 0],
     [0, 0, 0, 0],
     [1, 0, 0, 1],
   ],
   [
+    //9, 箱
     [1, 1, 1, 1],
     [1, 0, 0, 1],
     [1, 0, 0, 1],
     [1, 1, 1, 1],
   ],
   [
+    //10, 1つだけ
     [0, 0, 0, 0],
     [0, 0, 0, 0],
     [0, 1, 0, 0],
     [0, 0, 0, 0],
   ],
 ];
+
 // テトロミノの初期地点　ー＞　画面中央の上から出現する
-const startX = fieldCol / 2 - tetroSize / 2;
-const startY = 0;
-
-// テトロミノの座標
-let tetroX = startX;
-let tetroY = startY;
-
-// テトロミノの落ちるスピード -> dropSpeed (ミリ秒)に１ブロック分落ちる (1000ミリ秒で1秒)
-let dropSpeed = 800;
-
-// 経過時間（ターン）
-let turn = 0;
-// キーボード操作
+export const startX = fieldCol / 2 - tetroSize / 2;
+export const startY = 0;
 
 /* スコア登録のボタン及びモーダルウィンドウ部分のスクリプト */
-const openButton = document.getElementById("openButton");
-// @ts-expect-error TS(2531): Object is possibly 'null'.
+export const openButton = document.getElementById(
+  "openButton"
+) as HTMLButtonElement;
 openButton.style.display = "none";
 
-// ゲームの実行処理
-let Ttype = getRandomNum(1, tetroTypes.length - 1);
-let newTtype = getRandomNum(1, tetroTypes.length - 1);
+export const tetris = new Tetris(
+  new Mino(0),
+  new Mino(0),
+  new Position2d(startX, startY)
+);
 
-// console.log("now : " + Ttype + " new : " + newTtype);
+tetris.startGame();
 
-let newTetro = tetroTypes[newTtype];
-let tetro = tetroTypes[Ttype];
-let gameId;
-
-init();
-startGame(dropSpeed);
+export {};
