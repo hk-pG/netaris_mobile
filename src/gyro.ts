@@ -1,5 +1,7 @@
 import typescriptLogo from "./typescript.svg";
 
+console.log("センサーを使います");
+
 const motion = document.getElementById("motion");
 
 const img = document.createElement("img");
