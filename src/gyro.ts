@@ -1,6 +1,10 @@
-import "./style.css";
+import typescriptLogo from "./typescript.svg";
 
 const motion = document.getElementById("motion");
+
+const img = document.createElement("img");
+img.src = typescriptLogo;
+motion?.appendChild(img);
 
 const handleMotionEvent = (event: DeviceMotionEvent): void => {
   console.info("Device motion event: " + event);
