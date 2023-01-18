@@ -1,4 +1,4 @@
-import { System } from "./GameVariable";
+import { System } from "./System";
 import { getRandomNum } from "./functions/rand";
 import {
   baka,
@@ -43,7 +43,7 @@ const buttonDisplay = () => {
   openButton.style.display = "block";
 };
 
-const addScore = (lineCount: any) => {
+const addScore = (lineCount: number) => {
   console.log(`lineCount is ${lineCount}`);
   let add = (lineCount + Math.floor(lineCount / 2)) * 100;
   console.log(add);
@@ -52,7 +52,12 @@ const addScore = (lineCount: any) => {
 };
 
 // ブロック一つを描画する
-const drawBlock = (x: any, y: any, c: any, where: any) => {
+export const drawBlock = (
+  x: number,
+  y: number,
+  c: number,
+  where: CanvasRenderingContext2D
+) => {
   let px = x * blockSize;
   let py = y * blockSize;
 
@@ -70,19 +75,20 @@ const drawBlock = (x: any, y: any, c: any, where: any) => {
     where.setLineDash([0, 0]);
   }
 
-  if (Ttype != 9) {
+  if (tetris.currentMino.type != 9) {
     where.strokeRect(px, py, blockSize, blockSize);
   }
 };
 
 //ブロックの当たり判定
-const checkMove = (mx: any, my: any) => {
-  // if (ntetro == undefined) ntetro = tetro;
-  const ntetro = tetro;
+const checkMove = (mx: number, my: number, ntetro?: number[][]) => {
+  if (ntetro == undefined) ntetro = tetris.currentMino.mino;
+  const nextMino = tetris.currentMino.getMino();
 
   for (let y = 0; y < tetroSize; y++) {
     for (let x = 0; x < tetroSize; x++) {
-      if (ntetro[y][x]) {
+      if (nextMino[y][x]) {
+        const { x: tetroX, y: tetroY } = tetris.currentPos.getPos();
         let nx = tetroX + mx + x;
         let ny = tetroY + my + y;
 
@@ -91,7 +97,7 @@ const checkMove = (mx: any, my: any) => {
           nx < 0 ||
           ny >= fieldRow ||
           nx >= fieldCol ||
-          field[ny][nx]
+          tetris.currentMino.getMino()
         )
           return false;
       }
@@ -103,6 +109,7 @@ const checkMove = (mx: any, my: any) => {
 const drawAll = () => {
   // フィールドのクリア　ー＞　現在の描画を一旦消す
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const field = tetris.currentMino.getMino();
 
   // フィールドの描画
   for (let y = 0; y < fieldRow; y++) {
@@ -119,12 +126,15 @@ const drawAll = () => {
   let under = 0;
   while (checkMove(0, under + 1)) under++;
   let writeLine = true;
-  if (Ttype == 9) writeLine = false;
+  if (tetris.currentMino.type == 9) writeLine = false;
+
+  const tetro = tetris.currentMino.getMino();
 
   for (let y = 0; y < tetroSize; y++) {
     for (let x = 0; x < tetroSize; x++) {
       if (tetro[y][x]) {
         // 着地点
+        const { x: tetroX, y: tetroY } = tetris.currentPos.getPos();
         if (writeLine) {
           drawBlock(
             tetroX + x,
@@ -135,12 +145,12 @@ const drawAll = () => {
         }
 
         // テトロミノ本体
-        drawBlock(tetroX + x, tetroY + y, Ttype, ctx);
+        drawBlock(tetroX + x, tetroY + y, tetris.currentMino.type!, ctx);
       }
     }
   }
 
-  if (gameOver) {
+  if (System._isGameOvered) {
     ctx.font = "bold 250% verdana";
     let overMessage = "＼(^o^)／ｵﾜﾀ";
     let w = ctx.measureText(overMessage).width;
@@ -157,11 +167,15 @@ const drawAll = () => {
 };
 
 const fixTetro = () => {
+  const tetro = tetris.currentMino.getMino();
   for (let y = 0; y < tetroSize; y++) {
     for (let x = 0; x < tetroSize; x++) {
       if (tetro[y][x]) {
+        const { x: tetroX, y: tetroY } = tetris.currentPos.getPos();
+        const type = tetris.currentMino.type;
+        if (!type) return;
         //   フィールドに現在のタイプ（Ttype）のミノを固定する
-        field[tetroY + y][tetroX + x] = Ttype;
+        tetris.field[tetroY + y][tetroX + x] = type;
       }
     }
   }
@@ -172,7 +186,7 @@ const checkLine = () => {
   for (let y = 0; y < fieldRow; y++) {
     let flag = true;
     for (let x = 0; x < fieldCol; x++) {
-      if (!field[y][x]) {
+      if (!tetris.field[y][x]) {
         flag = false;
         break;
       }
@@ -182,7 +196,7 @@ const checkLine = () => {
       lineCount++;
       for (let ny = y; ny > 0; ny--) {
         for (let nx = 0; nx < fieldCol; nx++) {
-          field[ny][nx] = field[ny - 1][nx];
+          tetris.field[ny][nx] = tetris.field[ny - 1][nx];
         }
       }
       addScore(lineCount);
@@ -193,8 +207,9 @@ const checkLine = () => {
 const drawNext = () => {
   for (let y = 0; y < tetroSize; y++) {
     for (let x = 0; x < tetroSize; x++) {
-      if (newTetro[y][x]) {
-        drawBlock(x, y, newTtype, ntx);
+      const next = tetris.nextMino;
+      if (next.mino[y][x]) {
+        drawBlock(x, y, next.type!, ntx);
       }
     }
   }
@@ -203,27 +218,28 @@ const drawNext = () => {
 //    テトロミノが落ちる処理
 const dropBlock = () => {
   //    ゲームオーバーだったら、その時点で処理をしない
-  if (gameOver) {
+  if (System._isGameOvered) {
     restartGame();
     return;
   }
-  if (gameStart) {
+  if (System._isGameStarted) {
     if (checkMove(0, 1) /* 現在地の一つ下に行けるか（落ちれるか）を調べる */) {
-      tetroY++; // 一つ下にミノを落とす
+      tetris.currentPos.drop(); // tetroY++; // 一つ下にミノを落とす
     } else {
       //もう下に行けない　ー＞　一番下もしくはミノの上
 
-      toggleHold = true;
+      tetris.allowHold();
 
       fixTetro(); //フィールドに現在のミノを同化させる
 
       checkLine(); //一行消せるかどうかを確認する
 
-      createTetro(); // 新しいミノを作る
+      // createTetro(); // 新しいミノを作る
+      tetris.createTetris();
 
       // 新しいミノが現在地で動けるかどうか　ー＞　動けない　＝　ミノまたは壁に接触している　＝　ゲームオーバー
       if (!checkMove(0, 0)) {
-        gameOver = true;
+        System.overGame();
       }
     }
     //また描画リセット＆着地点等の処理を呼ぶ
@@ -234,21 +250,10 @@ const dropBlock = () => {
   }
 };
 
-const createTetro = () => {
-  Ttype = newTtype;
-  newTtype = getRandomNum(1, tetroTypes.length - 1);
-
-  tetro = tetroTypes[Ttype];
-  ntx.clearRect(0, 0, next.width, next.height);
-  newTetro = tetroTypes[newTtype];
-
-  tetroX = startX;
-  tetroY = startY;
-};
-
 // テトロミノの回転
-const rotate = (rotateType: any) => {
+const rotate = (rotateType: number) => {
   let newTet: number[][] = [];
+  const tetro = tetris.currentMino.mino;
   for (let y = 0; y < tetroSize; y++) {
     newTet[y] = [];
     for (let x = 0; x < tetroSize; x++) {
@@ -269,87 +274,74 @@ const rotate = (rotateType: any) => {
   return newTet;
 };
 
-const tetroHold = () => {
-  if (toggleHold) {
-    toggleHold = false;
-    if (!hold) {
-      hold = true;
-      holdType = Ttype;
-      holdTetro = tetroTypes[holdType];
-      createTetro();
-    } else {
-      let beforeHold = Ttype;
-      Ttype = holdType;
-      holdType = beforeHold;
-      tetro = tetroTypes[Ttype];
-      holdTetro = tetroTypes[holdType];
-      tetroX = startX;
-      tetroY = startY;
-    }
-    htx.clearRect(0, 0, holdView.width, holdView.height);
-    for (let x = 0; x < tetroSize; x++) {
-      for (let y = 0; y < tetroSize; y++) {
-        if (holdTetro[y][x]) drawBlock(x, y, holdType, htx);
-      }
-    }
-  }
+export const startGame = (speed: number) => {
+  System.gameId = setInterval(dropBlock, speed);
 };
 
-export const startGame = (speed: any) => {
-  gameId = setInterval(dropBlock, speed);
-};
-
-const changeSpeed = (speed: any) => {
-  clearInterval(gameId);
+const changeSpeed = (speed: number) => {
+  clearInterval(System.gameId);
   startGame(speed);
-  console.log(dropSpeed);
 };
 document.onkeydown = (e) => {
-  gameController(e);
+  gameController(e.keyCode);
 };
 
 document.onkeydown = (e) => {
   gameController(e.keyCode);
 };
-const gameController = (e: any) => {
-  if (gameOver) return;
+const gameController = (keycode: number) => {
+  if (System._isGameOvered) return;
   let nteto;
-  if (gameStart) {
-    switch (e) {
+  if (System._isGameStarted) {
+    switch (keycode) {
       case 37:
         // 左
-        if (checkMove(-1, 0)) tetroX--;
+        if (checkMove(-1, 0)) {
+          // tetroX--;
+          tetris.currentPos.moveLeft();
+        }
         break;
       case 38:
         // 上キーを押すと、一気に下に行く
-        while (checkMove(0, 1)) tetroY += 1;
+        while (checkMove(0, 1)) {
+          // tetroY += 1;
+          tetris.currentPos.drop();
+        }
         break;
       case 39:
         // 右
-        if (checkMove(1, 0)) tetroX++;
+        if (checkMove(1, 0)) {
+          // tetroX++;
+          tetris.currentPos.moveRight();
+        }
         break;
       case 40:
         // 下
-        if (checkMove(0, 1)) tetroY++;
+        if (checkMove(0, 1)) {
+          // tetroY++;
+          tetris.currentPos.drop();
+        }
         break;
       case 70:
         // Fキー
         nteto = rotate(0);
-        if (checkMove(0, 0, nteto)) tetro = nteto;
+        if (checkMove(0, 0, nteto)) tetris.currentMino.mino = nteto;
         break;
       case 68:
         nteto = rotate(1);
-        if (checkMove(0, 0, nteto)) tetro = nteto;
+        if (checkMove(0, 0, nteto)) tetris.currentMino.mino = nteto;
         break;
       case 32:
         // スペース
-        tetroHold();
+        // tetroHold();
+        tetris.hold();
         break;
     }
     drawAll();
   } else {
-    if (e === 32) {
-      gameStart = true;
+    if (keycode === 32) {
+      // gameStart = true;
+      System.startGame();
       console.log("before start");
     }
   }

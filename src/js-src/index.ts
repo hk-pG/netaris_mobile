@@ -2,6 +2,7 @@ import "./style.css";
 
 import { getRandomNum } from "./functions/rand";
 import { Mino, Position2d, Tetris } from "./Tetris";
+import { System } from "./System";
 
 // ミノを構成する一つのブロックのサイズ
 export const blockSize = 30;
@@ -53,9 +54,6 @@ export const ntx = next.getContext("2d")!;
 
 next.width = blockSize * 4;
 next.height = blockSize * 4;
-
-export const scoreView = document.getElementById("score") as HTMLElement;
-scoreView.innerText = `SCORE : ${score} P`;
 
 // ホールド画面の表示
 export const holdView = document.getElementById("hold") as HTMLCanvasElement;
@@ -175,6 +173,9 @@ export const tetris = new Tetris(
   new Mino(0),
   new Position2d(startX, startY)
 );
+
+export const scoreView = document.getElementById("score") as HTMLElement;
+scoreView.innerText = `SCORE : ${System.score} P`;
 
 tetris.startGame();
 
