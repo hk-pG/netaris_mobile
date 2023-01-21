@@ -1,0 +1,17 @@
+{
+  "workbench.colorTheme": "Default High Contrast",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "cSpell.words": [
+    "baka",
+    "limegreen",
+    "Mino",
+    "nteto",
+    "ntetro",
+    "skyblue",
+    "Tetris",
+    "Tetro",
+    "Ttype"
+  ],
+  "editor.fontSize": 9
+}
