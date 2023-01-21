@@ -6,7 +6,7 @@ import {
   tetroSize,
   tetroTypes,
 } from "./index";
-import { checkMove, drawBlock, dropBlock } from "./functions";
+import { drawBlock, dropBlock } from "./functions";
 import { getRandomNum } from "./functions/rand";
 import { System } from "./System";
 import { canvas, ctx, holdView, htx, next, ntx } from "./dom";
@@ -39,6 +39,31 @@ export class Tetris {
     this.init();
   }
 
+  // 初期化
+  public init() {
+    console.log("init");
+
+    for (let y = 0; y < fieldRow; y++) {
+      this.field[y] = [];
+      for (let x = 0; x < fieldCol; x++) {
+        this.field[y][x] = 0;
+      }
+    }
+  }
+
+  // ゲーム開始
+  public startGame() {
+    System.gameId = setInterval(dropBlock, this.dropSpeed);
+  }
+
+  // 速度変更
+  public changeSpeed(speedMilliseconds: number) {
+    clearInterval(System.gameId);
+    this.dropSpeed = speedMilliseconds;
+    this.startGame();
+  }
+
+  // 描画系
   public draw() {
     this.drawField();
 
@@ -67,18 +92,18 @@ export class Tetris {
   }
 
   public drawMino() {
-    // テトロミノの描画 ----------------------------------------------------------------
+    // テトロミノの描画
     //  下にいくつ行けるかを調べる
     let under = 0;
-    while (checkMove(0, under + 1)) under++;
+    while (this.checkMove(0, under + 1)) under++;
     let writeLine = true;
-    if (this.currentMino.type == 9) writeLine = false;
+    if (this.currentMino._type == 9) writeLine = false;
 
-    const tetro = this.currentMino.getMino();
+    const currentMino = this.currentMino._mino;
 
     for (let y = 0; y < tetroSize; y++) {
       for (let x = 0; x < tetroSize; x++) {
-        if (tetro[y][x]) {
+        if (currentMino[y][x]) {
           // 着地点
           const { x: tetroX, y: tetroY } = this.currentPos.getPos();
           if (writeLine) {
@@ -91,7 +116,7 @@ export class Tetris {
           }
 
           // テトロミノ本体
-          drawBlock(tetroX + x, tetroY + y, this.currentMino.type, ctx);
+          drawBlock(tetroX + x, tetroY + y, this.currentMino._type, ctx);
         }
       }
     }
@@ -100,61 +125,78 @@ export class Tetris {
   public drawNext() {
     for (let y = 0; y < tetroSize; y++) {
       for (let x = 0; x < tetroSize; x++) {
-        console.info(`next type is ${this.nextMino.type}`);
-        if (this.nextMino.mino[y][x]) {
+        console.info(`next type is ${this.nextMino._type}`);
+        if (this.nextMino._mino[y][x]) {
           // ntxにnextミノを描画する
-          drawBlock(x, y, this.nextMino.type, ntx);
+          drawBlock(x, y, this.nextMino._type, ntx);
         }
       }
     }
   }
 
-  public get _dropSpeed(): number {
-    return this.dropSpeed;
-  }
-
-  public startGame() {
-    System.gameId = setInterval(dropBlock, this.dropSpeed);
-  }
-
-  public changeSpeed(speedMilliseconds: number) {
-    clearInterval(System.gameId);
-    this.dropSpeed = speedMilliseconds;
-    this.startGame();
-  }
-
-  public init() {
-    console.log("init");
-
-    for (let y = 0; y < fieldRow; y++) {
-      this.field[y] = [];
-      for (let x = 0; x < fieldCol; x++) {
-        this.field[y][x] = 0;
-      }
-    }
-  }
-
+  // 新たにミノを作り、座標を初期値に設定する
   public createTetris() {
-    // Ttype = newTtype;
-    this.currentMino.type = this.nextMino.type;
+    /* 1. 使用するタイプを保存、作成する */
+    // 現在のnextのタイプを保存し、これをcurrentに移す
+    const currentType = this.nextMino._type;
+    // 次のミノのタイプを作成
+    const nextType = getRandomNum(1, tetroTypes.length - 1);
 
-    // newTtype = getRandomNum(1, tetroTypes.length - 1);
-    const type = (this.nextMino.type = getRandomNum(1, tetroTypes.length - 1));
-
-    // tetro = tetroTypes[Ttype];
-    this.currentMino.mino = tetroTypes[type];
+    /* 2. 用意したタイプにcurrent,nextのミノを変更する */
+    this.currentMino.changeMino(currentType);
 
     ntx.clearRect(0, 0, next.width, next.height);
 
-    // newTetro = tetroTypes[newTtype];
-    this.nextMino.mino = tetroTypes[this.nextMino.type];
+    this.nextMino.changeMino(nextType);
 
-    // tetroX = startX;
-    // tetroY = startY;
-
+    // currentの初期位置を設定する
     this.currentPos.setPos({ x: startX, y: startY });
   }
 
+  //ブロックの当たり判定
+  checkMove(
+    //
+    mx: number,
+    my: number,
+    nextMino = this.currentMino._mino
+  ) {
+    for (let y = 0; y < tetroSize; y++) {
+      for (let x = 0; x < tetroSize; x++) {
+        if (nextMino[y][x]) {
+          const { x: tetroX, y: tetroY } = this.currentPos.getPos();
+          let nx = tetroX + mx + x;
+          let ny = tetroY + my + y;
+
+          if (
+            ny < 0 ||
+            nx < 0 ||
+            ny >= fieldRow ||
+            nx >= fieldCol ||
+            this.field[ny][nx]
+          )
+            return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   *
+   * @param direction 0 or 1
+   * 0:時計回り
+   * 1:反時計回り
+   */
+  public rotateMino(direction: number) {
+    if (this.checkMove(0, 0, this.currentMino._mino)) {
+      this.currentMino.rotateMino(direction);
+      return true;
+    }
+
+    return false;
+  }
+
+  // ホールド
   public hold() {
     if (this.isAllowedHold) {
       // 無限にホールドできないように１度したら置くまでできない
@@ -165,7 +207,7 @@ export class Tetris {
 
         // 現在のミノをホールドするので、
         // 現在のミノの情報をまるまるホールドミノへこぴーする
-        this.holdMino.changeMino(this.currentMino.type);
+        this.holdMino.changeMino(this.currentMino._type);
 
         // createTetro();
         this.createTetris();
@@ -173,7 +215,7 @@ export class Tetris {
         // ホールドしている -> 入れ替えをする
 
         // 現在のミノのタイプを記録し、後でホールドする
-        let beforeHoldType = this.currentMino.type;
+        let beforeHoldType = this.currentMino._type;
 
         this.currentMino.changeMino(beforeHoldType);
         // holdType = beforeHoldType;
@@ -187,19 +229,25 @@ export class Tetris {
       htx.clearRect(0, 0, holdView.width, holdView.height);
       for (let x = 0; x < tetroSize; x++) {
         for (let y = 0; y < tetroSize; y++) {
-          if (this.holdMino.mino[y][x]) {
-            drawBlock(x, y, this.holdMino.type, htx);
+          if (this.holdMino._mino[y][x]) {
+            drawBlock(x, y, this.holdMino._type, htx);
           }
         }
       }
     }
   }
 
+  // holdの許可フラグ(無限ホールド防止)
   public allowHold() {
     this.isAllowedHold = true;
   }
 
   public prohibitedHold() {
     this.isAllowedHold = false;
+  }
+
+  // getter
+  public get _dropSpeed(): number {
+    return this.dropSpeed;
   }
 }

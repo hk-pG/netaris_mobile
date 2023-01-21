@@ -1,6 +1,5 @@
 import { tetris } from "..";
 import { System } from "../System";
-import { checkMove, rotate } from "../functions";
 
 const Key = {
   ArrowLeft: "ArrowLeft",
@@ -12,45 +11,43 @@ const Key = {
 
 export const gameController = (key: string) => {
   if (System._isGameOvered) return;
-  let nextMino;
+  let rotatedMino;
   if (System._isGameStarted) {
     switch (key) {
       case Key.ArrowLeft:
         // 左
-        if (checkMove(-1, 0)) {
+        if (tetris.checkMove(-1, 0)) {
           // tetroX--;
           tetris.currentPos.moveLeft();
         }
         break;
       case Key.ArrowUp:
         // 上キーを押すと、一気に下に行く
-        while (checkMove(0, 1)) {
+        while (tetris.checkMove(0, 1)) {
           // tetroY += 1;
           tetris.currentPos.drop();
         }
         break;
       case Key.ArrowRight:
         // 右
-        if (checkMove(1, 0)) {
+        if (tetris.checkMove(1, 0)) {
           // tetroX++;
           tetris.currentPos.moveRight();
         }
         break;
       case Key.ArrowDown:
         // 下
-        if (checkMove(0, 1)) {
+        if (tetris.checkMove(0, 1)) {
           // tetroY++;
           tetris.currentPos.drop();
         }
         break;
       case "f" || "F":
         // Fキー
-        nextMino = rotate(0);
-        if (checkMove(0, 0, nextMino)) tetris.currentMino.mino = nextMino;
+        tetris.currentMino.rotateMino(0);
         break;
       case "d" || "D":
-        nextMino = rotate(1);
-        if (checkMove(0, 0, nextMino)) tetris.currentMino.mino = nextMino;
+        tetris.currentMino.rotateMino(1);
         break;
       case Key.Space:
         // スペース

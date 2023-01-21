@@ -1,16 +1,24 @@
 import { tetroSize, tetroTypes } from "..";
 
 export class Mino {
-  public mino: number[][] = [];
-  public type: number;
+  private mino: number[][] = [];
+  private type: number;
 
   constructor(type: number) {
     this.type = type;
     this.mino = tetroTypes[this.type];
   }
 
-  public getMino() {
+  public get _mino() {
     return this.mino;
+  }
+
+  public get _type() {
+    return this.type;
+  }
+
+  public getInfo() {
+    return { mino: this.mino, type: this.type };
   }
 
   public changeMino(minoType: number) {
@@ -29,12 +37,13 @@ export class Mino {
    * @returns
    */
   public rotateMino(rotateType: number): number[][] {
-    let newTet: number[][] = [];
+    const rotatedMino: number[][] = [];
     for (let y = 0; y < tetroSize; y++) {
-      newTet[y] = [];
+      rotatedMino[y] = [];
       for (let x = 0; x < tetroSize; x++) {
         let nx;
         let ny;
+        // 回転方向によって、入れ替える向きを変える
         if (!rotateType) {
           nx = tetroSize - x - 1;
           ny = y;
@@ -42,9 +51,12 @@ export class Mino {
           nx = x;
           ny = tetroSize - y - 1;
         }
-        newTet[y][x] = this.mino[nx][ny];
+        rotatedMino[y][x] = this.mino[nx][ny];
       }
     }
-    return newTet;
+
+    this.mino = rotatedMino;
+
+    return rotatedMino;
   }
 }

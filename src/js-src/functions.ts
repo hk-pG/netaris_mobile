@@ -51,45 +51,18 @@ export const drawBlock = (
     where.setLineDash([0, 0]);
   }
 
-  if (tetris.currentMino.type != 9) {
+  if (tetris.currentMino._type != 9) {
     where.strokeRect(px, py, blockSize, blockSize);
   }
 };
 
-//ブロックの当たり判定
-export const checkMove = (
-  mx: number,
-  my: number,
-  nextMino = tetris.currentMino.mino
-) => {
-  for (let y = 0; y < tetroSize; y++) {
-    for (let x = 0; x < tetroSize; x++) {
-      if (nextMino[y][x]) {
-        const { x: tetroX, y: tetroY } = tetris.currentPos.getPos();
-        let nx = tetroX + mx + x;
-        let ny = tetroY + my + y;
-
-        if (
-          ny < 0 ||
-          nx < 0 ||
-          ny >= fieldRow ||
-          nx >= fieldCol ||
-          tetris.field[ny][nx]
-        )
-          return false;
-      }
-    }
-  }
-  return true;
-};
-
 const fixTetro = () => {
-  const tetro = tetris.currentMino.getMino();
+  const tetro = tetris.currentMino._mino;
   for (let y = 0; y < tetroSize; y++) {
     for (let x = 0; x < tetroSize; x++) {
       if (tetro[y][x]) {
         const { x: tetroX, y: tetroY } = tetris.currentPos.getPos();
-        const type = tetris.currentMino.type;
+        const type = tetris.currentMino._type;
         if (!type) return;
         //   フィールドに現在のタイプ（Ttype）のミノを固定する
         tetris.field[tetroY + y][tetroX + x] = type;
@@ -129,7 +102,12 @@ export const dropBlock = () => {
     return;
   }
   if (System._isGameStarted) {
-    if (checkMove(0, 1) /* 現在地の一つ下に行けるか（落ちれるか）を調べる */) {
+    if (
+      tetris.checkMove(
+        0,
+        1
+      ) /* 現在地の一つ下に行けるか（落ちれるか）を調べる */
+    ) {
       tetris.currentPos.drop(); // tetroY++; // 一つ下にミノを落とす
     } else {
       //もう下に行けない　ー＞　一番下もしくはミノの上
@@ -144,7 +122,7 @@ export const dropBlock = () => {
       tetris.createTetris();
 
       // 新しいミノが現在地で動けるかどうか　ー＞　動けない　＝　ミノまたは壁に接触している　＝　ゲームオーバー
-      if (!checkMove(0, 0)) {
+      if (!tetris.checkMove(0, 0)) {
         System.overGame();
       }
     }
@@ -153,26 +131,4 @@ export const dropBlock = () => {
   } else {
     gameStartMessage();
   }
-};
-
-// テトロミノの回転
-export const rotate = (rotateType: number) => {
-  let newTet: number[][] = [];
-  const tetro = tetris.currentMino.mino;
-  for (let y = 0; y < tetroSize; y++) {
-    newTet[y] = [];
-    for (let x = 0; x < tetroSize; x++) {
-      let nx;
-      let ny;
-      if (!rotateType) {
-        nx = tetroSize - x - 1;
-        ny = y;
-      } else {
-        nx = x;
-        ny = tetroSize - y - 1;
-      }
-      newTet[y][x] = tetro[nx][ny];
-    }
-  }
-  return newTet;
 };
