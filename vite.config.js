@@ -12,7 +12,7 @@ export default defineConfig({
       input: {
         gyro: resolve(root, "src", "gyro", "index.html"),
         tetris: resolve(root, "src", "tetris", "index.html"),
-        // "/": resolve(root, "index.html"),
+        main: resolve(root, "index.html"),
       },
     },
   },
