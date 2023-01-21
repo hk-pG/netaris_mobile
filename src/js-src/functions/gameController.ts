@@ -11,7 +11,6 @@ const Key = {
 
 export const gameController = (key: string) => {
   if (System._isGameOvered) return;
-  let rotatedMino;
   if (System._isGameStarted) {
     switch (key) {
       case Key.ArrowLeft:

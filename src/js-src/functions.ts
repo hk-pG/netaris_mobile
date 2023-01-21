@@ -1,5 +1,5 @@
 import { System } from "./System";
-import { canvas, ctx, ntx } from "./dom";
+import { ctx } from "./dom";
 import { gameStartMessage } from "./functions/gameStartMessage";
 import { restartGame } from "./functions/restartGame";
 import {
@@ -56,7 +56,11 @@ export const drawBlock = (
   }
 };
 
-const fixTetro = () => {
+/**
+ * @description 現在のミノが着地した際、フィールドにミノを固定する
+ * @returns void
+ */
+const fixMinoToField = () => {
   const tetro = tetris.currentMino._mino;
   for (let y = 0; y < tetroSize; y++) {
     for (let x = 0; x < tetroSize; x++) {
@@ -72,20 +76,23 @@ const fixTetro = () => {
 };
 
 const checkLine = () => {
-  let lineCount = 0;
   for (let y = 0; y < fieldRow; y++) {
-    let flag = true;
+    // １行を見る
+    let isFilledLine = true;
     for (let x = 0; x < fieldCol; x++) {
       if (!tetris.field[y][x]) {
-        flag = false;
+        // ある行のある列が0だったら(ミノが存在しないので消せない)
+        isFilledLine = false;
         break;
       }
     }
 
-    if (flag) {
+    let lineCount = 0;
+    if (isFilledLine) {
       lineCount++;
       for (let ny = y; ny > 0; ny--) {
         for (let nx = 0; nx < fieldCol; nx++) {
+          // 埋まっている行は消えるので、１行分下げる
           tetris.field[ny][nx] = tetris.field[ny - 1][nx];
         }
       }
@@ -114,9 +121,9 @@ export const dropBlock = () => {
 
       tetris.allowHold();
 
-      fixTetro(); //フィールドに現在のミノを同化させる
+      fixMinoToField(); //フィールドに現在のミノを同化させる
 
-      checkLine(); //一行消せるかどうかを確認する
+      checkLine(); //一行消せるかどうかを確認する&消せれば消す
 
       // createTetro(); // 新しいミノを作る
       tetris.createTetris();
