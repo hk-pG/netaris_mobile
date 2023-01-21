@@ -1,47 +1,16 @@
 import { System } from "./System";
-import { getRandomNum } from "./functions/rand";
+import { canvas, ctx, ntx } from "./dom";
+import { gameStartMessage } from "./functions/gameStartMessage";
+import { restartGame } from "./functions/restartGame";
 import {
-  baka,
   blockSize,
-  canvas,
-  ctx,
   fieldCol,
   fieldRow,
-  ntx,
-  openButton,
   scoreView,
   tetris,
   tetroColors,
   tetroSize,
-  tetroTypes,
 } from "./index";
-
-const restartButton = document.getElementById("restart-button")!;
-
-const restartGame = () => {
-  restartButton.classList.remove("hidden");
-  restartButton.addEventListener("click", () => {
-    location.reload();
-  });
-};
-
-const gameStartMessage = () => {
-  ctx.beginPath();
-  ctx.font = "bold 150% verdana";
-  let overMessage = "START TO 'SPACE'";
-  let w = ctx.measureText(overMessage).width;
-  let x = canvas.width / 2 - w / 2;
-  let y = canvas.height / 2 - w / 20;
-  ctx.fillStyle = "white";
-  ctx.lineWidth = 4;
-  ctx.strokeText(overMessage, x, y);
-  ctx.fillText(overMessage, x, y);
-  ctx.closePath();
-};
-
-const buttonDisplay = () => {
-  openButton.style.display = "block";
-};
 
 const addScore = (lineCount: number) => {
   console.log(`lineCount is ${lineCount}`);
@@ -81,10 +50,11 @@ export const drawBlock = (
 };
 
 //ブロックの当たり判定
-const checkMove = (mx: number, my: number, ntetro?: number[][]) => {
-  if (ntetro == undefined) ntetro = tetris.currentMino.mino;
-  const nextMino = tetris.currentMino.getMino();
-
+export const checkMove = (
+  mx: number,
+  my: number,
+  nextMino = tetris.currentMino.mino
+) => {
   for (let y = 0; y < tetroSize; y++) {
     for (let x = 0; x < tetroSize; x++) {
       if (nextMino[y][x]) {
@@ -97,7 +67,7 @@ const checkMove = (mx: number, my: number, ntetro?: number[][]) => {
           nx < 0 ||
           ny >= fieldRow ||
           nx >= fieldCol ||
-          tetris.currentMino.getMino()
+          tetris.field[ny][nx]
         )
           return false;
       }
@@ -106,10 +76,10 @@ const checkMove = (mx: number, my: number, ntetro?: number[][]) => {
   return true;
 };
 
-const drawAll = () => {
+export const drawAll = () => {
   // フィールドのクリア　ー＞　現在の描画を一旦消す
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const field = tetris.currentMino.getMino();
+  const field = tetris.field;
 
   // フィールドの描画
   for (let y = 0; y < fieldRow; y++) {
@@ -145,24 +115,13 @@ const drawAll = () => {
         }
 
         // テトロミノ本体
-        drawBlock(tetroX + x, tetroY + y, tetris.currentMino.type!, ctx);
+        drawBlock(tetroX + x, tetroY + y, tetris.currentMino.type, ctx);
       }
     }
   }
 
   if (System._isGameOvered) {
-    ctx.font = "bold 250% verdana";
-    let overMessage = "＼(^o^)／ｵﾜﾀ";
-    let w = ctx.measureText(overMessage).width;
-    let x = canvas.width / 2 - w / 2;
-    let y = canvas.height / 2 - w / 20;
-    ctx.fillStyle = "white";
-    ctx.lineWidth = 4;
-    ctx.strokeText(overMessage, x, y);
-    ctx.fillText(overMessage, x, y);
-    baka.innerText = "ごめんなさい(m´・ω・｀)m";
-    baka.classList.add("impact");
-    buttonDisplay();
+    System.overGame();
   }
 };
 
@@ -208,15 +167,16 @@ const drawNext = () => {
   for (let y = 0; y < tetroSize; y++) {
     for (let x = 0; x < tetroSize; x++) {
       const next = tetris.nextMino;
+      console.info(`next type is ${next.type}`);
       if (next.mino[y][x]) {
-        drawBlock(x, y, next.type!, ntx);
+        drawBlock(x, y, next.type, ntx);
       }
     }
   }
 };
 
 //    テトロミノが落ちる処理
-const dropBlock = () => {
+export const dropBlock = () => {
   //    ゲームオーバーだったら、その時点で処理をしない
   if (System._isGameOvered) {
     restartGame();
@@ -251,7 +211,7 @@ const dropBlock = () => {
 };
 
 // テトロミノの回転
-const rotate = (rotateType: number) => {
+export const rotate = (rotateType: number) => {
   let newTet: number[][] = [];
   const tetro = tetris.currentMino.mino;
   for (let y = 0; y < tetroSize; y++) {
@@ -263,8 +223,6 @@ const rotate = (rotateType: number) => {
         nx = tetroSize - x - 1;
         ny = y;
       } else {
-        // nx = tetroSize - y - 1;
-        // ny = tetroSize - x - 1
         nx = x;
         ny = tetroSize - y - 1;
       }
@@ -272,77 +230,4 @@ const rotate = (rotateType: number) => {
     }
   }
   return newTet;
-};
-
-export const startGame = (speed: number) => {
-  System.gameId = setInterval(dropBlock, speed);
-};
-
-const changeSpeed = (speed: number) => {
-  clearInterval(System.gameId);
-  startGame(speed);
-};
-document.onkeydown = (e) => {
-  gameController(e.keyCode);
-};
-
-document.onkeydown = (e) => {
-  gameController(e.keyCode);
-};
-const gameController = (keycode: number) => {
-  if (System._isGameOvered) return;
-  let nteto;
-  if (System._isGameStarted) {
-    switch (keycode) {
-      case 37:
-        // 左
-        if (checkMove(-1, 0)) {
-          // tetroX--;
-          tetris.currentPos.moveLeft();
-        }
-        break;
-      case 38:
-        // 上キーを押すと、一気に下に行く
-        while (checkMove(0, 1)) {
-          // tetroY += 1;
-          tetris.currentPos.drop();
-        }
-        break;
-      case 39:
-        // 右
-        if (checkMove(1, 0)) {
-          // tetroX++;
-          tetris.currentPos.moveRight();
-        }
-        break;
-      case 40:
-        // 下
-        if (checkMove(0, 1)) {
-          // tetroY++;
-          tetris.currentPos.drop();
-        }
-        break;
-      case 70:
-        // Fキー
-        nteto = rotate(0);
-        if (checkMove(0, 0, nteto)) tetris.currentMino.mino = nteto;
-        break;
-      case 68:
-        nteto = rotate(1);
-        if (checkMove(0, 0, nteto)) tetris.currentMino.mino = nteto;
-        break;
-      case 32:
-        // スペース
-        // tetroHold();
-        tetris.hold();
-        break;
-    }
-    drawAll();
-  } else {
-    if (keycode === 32) {
-      // gameStart = true;
-      System.startGame();
-      console.log("before start");
-    }
-  }
 };

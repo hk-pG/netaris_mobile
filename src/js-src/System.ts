@@ -1,3 +1,9 @@
+import { baka, canvas, ctx, openButton } from "./dom";
+
+const buttonDisplay = () => {
+  openButton.style.display = "block";
+};
+
 export class System {
   private static isGameStarted: boolean = false;
   private static isGameOvered: boolean = false;
@@ -20,7 +26,21 @@ export class System {
   }
 
   static overGame() {
+    console.trace("overGame");
     this.isGameOvered = true;
+
+    ctx.font = "bold 250% verdana";
+    let overMessage = "＼(^o^)／ｵﾜﾀ";
+    let w = ctx.measureText(overMessage).width;
+    let x = canvas.width / 2 - w / 2;
+    let y = canvas.height / 2 - w / 20;
+    ctx.fillStyle = "white";
+    ctx.lineWidth = 4;
+    ctx.strokeText(overMessage, x, y);
+    ctx.fillText(overMessage, x, y);
+    baka.innerText = "ごめんなさい(m´・ω・｀)m";
+    baka.classList.add("impact");
+    buttonDisplay();
   }
 
   static get _isGameOvered(): boolean {
@@ -40,20 +60,3 @@ export class System {
     return this.score;
   }
 }
-
-/*
-// 変数
-
-// ゲームが開始しているかどうか
-export let gameStart = false;
-
-// ゲームオーバーフラグ
-export let gameOver = false;
-
-// 経過時間（ターン）
-export let turn = 0;
-
-// console.log("now : " + Ttype + " new : " + newTtype);
-
-export let gameId: number;
-*/

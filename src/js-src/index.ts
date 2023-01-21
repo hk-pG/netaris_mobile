@@ -1,8 +1,12 @@
 import "./style.css";
 
 import { getRandomNum } from "./functions/rand";
-import { Mino, Position2d, Tetris } from "./Tetris";
+import { Tetris } from "./Tetris";
 import { System } from "./System";
+import { gameController } from "./functions/gameController";
+import { bgImgContainer, canvas, holdView, next, openButton } from "./dom";
+import { Mino } from "./class/Mino";
+import { Position2d } from "./class/Position2d";
 
 // ミノを構成する一つのブロックのサイズ
 export const blockSize = 30;
@@ -12,10 +16,6 @@ export const tetroSize = 4;
 
 // 画面の準備 ----------------------------------------------------------------
 
-export const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-
-export const ctx = canvas.getContext("2d")!;
-
 export const fieldCol = 10;
 export const fieldRow = 20;
 
@@ -24,15 +24,10 @@ canvas.height = blockSize * fieldRow;
 
 export const body = document.querySelector("body");
 
-//背景画像
-const bgImgContainer = document.getElementById(
-  "bg-img-container"
-) as HTMLElement;
-
 bgImgContainer.style.minHeight = "100vh";
 
 const backgroundImage = [
-  "./sakura.jpg",
+  "https://pakutaso.cdn.rabify.me/shared/img/thumb/zubotty419DSC025802287.jpg.webp?d=1420",
   "https://www.pakutaso.com/shared/img/thumb/TSU1994052_TP_V.jpg",
   "https://www.pakutaso.com/shared/img/thumb/pakusky458A8762_TP_V.jpg",
   "https://www.pakutaso.com/shared/img/thumb/007ELA201029A_TP_V.jpg",
@@ -48,17 +43,8 @@ bgImgContainer.style.backgroundImage = `url(${
   backgroundImage[getRandomNum(0, backgroundImage.length - 1)]
 })`;
 
-// 次のミノの表示画面
-export const next = document.getElementById("next") as HTMLCanvasElement;
-export const ntx = next.getContext("2d")!;
-
 next.width = blockSize * 4;
 next.height = blockSize * 4;
-
-// ホールド画面の表示
-export const holdView = document.getElementById("hold") as HTMLCanvasElement;
-export const htx = holdView.getContext("2d")!;
-export const baka = document.getElementById("baka")!;
 
 holdView.width = blockSize * 4;
 holdView.height = blockSize * 4;
@@ -162,20 +148,25 @@ export const tetroTypes = [
 export const startX = fieldCol / 2 - tetroSize / 2;
 export const startY = 0;
 
-/* スコア登録のボタン及びモーダルウィンドウ部分のスクリプト */
-export const openButton = document.getElementById(
-  "openButton"
-) as HTMLButtonElement;
 openButton.style.display = "none";
 
 export const tetris = new Tetris(
-  new Mino(0),
-  new Mino(0),
-  new Position2d(startX, startY)
+  new Mino(1),
+  new Mino(2),
+  new Position2d(startX, startY),
+  800
 );
 
 export const scoreView = document.getElementById("score") as HTMLElement;
 scoreView.innerText = `SCORE : ${System.score} P`;
+
+document.onkeydown = (e) => {
+  gameController(e.key);
+};
+
+document.onkeydown = (e) => {
+  gameController(e.key);
+};
 
 tetris.startGame();
 
