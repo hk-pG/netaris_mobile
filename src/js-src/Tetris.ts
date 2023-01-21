@@ -6,10 +6,10 @@ import {
   tetroSize,
   tetroTypes,
 } from "./index";
-import { drawBlock, dropBlock } from "./functions";
+import { checkMove, drawBlock, dropBlock } from "./functions";
 import { getRandomNum } from "./functions/rand";
 import { System } from "./System";
-import { holdView, htx, next, ntx } from "./dom";
+import { canvas, ctx, holdView, htx, next, ntx } from "./dom";
 import { Position2d } from "./class/Position2d";
 import { Mino } from "./class/Mino";
 
@@ -37,6 +37,76 @@ export class Tetris {
     this.currentPos = initialMinoPos;
     this.dropSpeed = dropSpeedMillisecond;
     this.init();
+  }
+
+  public draw() {
+    this.drawField();
+
+    this.drawMino();
+
+    if (System._isGameOvered) {
+      System.overGame();
+    }
+
+    this.drawNext();
+  }
+
+  public drawField() {
+    // フィールドのクリア　ー＞　現在の描画を一旦消す
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const field = this.field;
+
+    // フィールドの描画
+    for (let y = 0; y < fieldRow; y++) {
+      for (let x = 0; x < fieldCol; x++) {
+        if (field[y][x]) {
+          drawBlock(x, y, field[y][x], ctx);
+        }
+      }
+    }
+  }
+
+  public drawMino() {
+    // テトロミノの描画 ----------------------------------------------------------------
+    //  下にいくつ行けるかを調べる
+    let under = 0;
+    while (checkMove(0, under + 1)) under++;
+    let writeLine = true;
+    if (this.currentMino.type == 9) writeLine = false;
+
+    const tetro = this.currentMino.getMino();
+
+    for (let y = 0; y < tetroSize; y++) {
+      for (let x = 0; x < tetroSize; x++) {
+        if (tetro[y][x]) {
+          // 着地点
+          const { x: tetroX, y: tetroY } = this.currentPos.getPos();
+          if (writeLine) {
+            drawBlock(
+              tetroX + x,
+              tetroY + y + under,
+              0,
+              ctx /* 0を指定すればテトロミノの0番目の空白のミノを指定できる */
+            );
+          }
+
+          // テトロミノ本体
+          drawBlock(tetroX + x, tetroY + y, this.currentMino.type, ctx);
+        }
+      }
+    }
+  }
+
+  public drawNext() {
+    for (let y = 0; y < tetroSize; y++) {
+      for (let x = 0; x < tetroSize; x++) {
+        console.info(`next type is ${this.nextMino.type}`);
+        if (this.nextMino.mino[y][x]) {
+          // ntxにnextミノを描画する
+          drawBlock(x, y, this.nextMino.type, ntx);
+        }
+      }
+    }
   }
 
   public get _dropSpeed(): number {

@@ -1,6 +1,6 @@
 import { tetris } from "..";
 import { System } from "../System";
-import { checkMove, drawAll, rotate } from "../functions";
+import { checkMove, rotate } from "../functions";
 
 const Key = {
   ArrowLeft: "ArrowLeft",
@@ -58,7 +58,7 @@ export const gameController = (key: string) => {
         tetris.hold();
         break;
     }
-    drawAll();
+    tetris.draw();
   } else {
     // ゲーム開始前
     if (key === Key.Space) {

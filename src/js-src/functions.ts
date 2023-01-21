@@ -83,55 +83,6 @@ export const checkMove = (
   return true;
 };
 
-export const drawAll = () => {
-  // フィールドのクリア　ー＞　現在の描画を一旦消す
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const field = tetris.field;
-
-  // フィールドの描画
-  for (let y = 0; y < fieldRow; y++) {
-    for (let x = 0; x < fieldCol; x++) {
-      if (field[y][x]) {
-        drawBlock(x, y, field[y][x], ctx);
-      }
-    }
-  }
-
-  // テトロミノの描画 ----------------------------------------------------------------
-
-  //  下にいくつ行けるかを調べる
-  let under = 0;
-  while (checkMove(0, under + 1)) under++;
-  let writeLine = true;
-  if (tetris.currentMino.type == 9) writeLine = false;
-
-  const tetro = tetris.currentMino.getMino();
-
-  for (let y = 0; y < tetroSize; y++) {
-    for (let x = 0; x < tetroSize; x++) {
-      if (tetro[y][x]) {
-        // 着地点
-        const { x: tetroX, y: tetroY } = tetris.currentPos.getPos();
-        if (writeLine) {
-          drawBlock(
-            tetroX + x,
-            tetroY + y + under,
-            0,
-            ctx /* 0を指定すればテトロミノの0番目の空白のミノを指定できる */
-          );
-        }
-
-        // テトロミノ本体
-        drawBlock(tetroX + x, tetroY + y, tetris.currentMino.type, ctx);
-      }
-    }
-  }
-
-  if (System._isGameOvered) {
-    System.overGame();
-  }
-};
-
 const fixTetro = () => {
   const tetro = tetris.currentMino.getMino();
   for (let y = 0; y < tetroSize; y++) {
@@ -170,18 +121,6 @@ const checkLine = () => {
   }
 };
 
-const drawNext = () => {
-  for (let y = 0; y < tetroSize; y++) {
-    for (let x = 0; x < tetroSize; x++) {
-      const next = tetris.nextMino;
-      console.info(`next type is ${next.type}`);
-      if (next.mino[y][x]) {
-        drawBlock(x, y, next.type, ntx);
-      }
-    }
-  }
-};
-
 //    テトロミノが落ちる処理
 export const dropBlock = () => {
   //    ゲームオーバーだったら、その時点で処理をしない
@@ -210,8 +149,7 @@ export const dropBlock = () => {
       }
     }
     //また描画リセット＆着地点等の処理を呼ぶ
-    drawAll();
-    drawNext();
+    tetris.draw();
   } else {
     gameStartMessage();
   }
