@@ -14,7 +14,10 @@ const form = document.querySelector("form");
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  if (score > 0) {
+  if (
+    // score
+    0 > 0
+  ) {
     //スコアが０点の情報はfirebaseにつなぐ前に弾く
 
     scores
@@ -23,13 +26,13 @@ form.addEventListener("submit", (e) => {
       .set({
         // @ts-expect-error TS(2531): Object is possibly 'null'.
         name: userName.value,
-        score: score,
+        // score: score,
       })
       .then(() => {
         console.log("successfully");
         // @ts-expect-error TS(2531): Object is possibly 'null'.
         console.log(`userName is ${userName.value}`);
-        console.log(`score is ${score}`);
+        // console.log(`score is ${score}`);
         setTimeout(() => {
           document.location.reload();
         }, 2500);
