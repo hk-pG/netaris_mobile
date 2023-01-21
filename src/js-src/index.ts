@@ -55,17 +55,17 @@ canvas.style.backgroundColor = fieldColor;
 canvas.style.outline = "4px solid #555";
 
 export const tetroColors = [
-  fieldColor,
-  "green",
-  "yellow",
-  "rgb(116, 143, 231)", //blue,
-  "skyblue",
-  "gray",
-  "orange",
-  "pink",
-  "#555",
-  "rgba(0, 0, 0, 0)", //透明
-  "limegreen",
+  fieldColor, //                0 背景と同じ (着地点で点線)
+  "green", //                   1 I
+  "yellow", //                  2 L
+  "rgb(116, 143, 231)", //      3 J,
+  "skyblue", //                 4 T
+  "gray", //                    5 O
+  "orange", //                  6 Z
+  "pink", //                    7 S
+  "#555", //                    8 四つ角
+  "rgba(0, 0, 0, 0)", //        9 箱
+  "limegreen", //              10 点
 ];
 
 // テトロミノの宣言
