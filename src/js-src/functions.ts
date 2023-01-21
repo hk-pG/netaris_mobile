@@ -21,22 +21,29 @@ const addScore = (lineCount: number) => {
 };
 
 // ブロック一つを描画する
+/**
+ *
+ * @param x 描画するx座標
+ * @param y 描画するy座標
+ * @param minoType 描画するミノのタイプ(0の場合は着地点を描画)
+ * @param where 描画するcanvasを指定する。ゲーム画面、next、ホールドのcontextを分けて使う
+ */
 export const drawBlock = (
   x: number,
   y: number,
-  c: number,
+  minoType: number,
   where: CanvasRenderingContext2D
 ) => {
   let px = x * blockSize;
   let py = y * blockSize;
 
   where.lineWidth = 1;
-  where.fillStyle = tetroColors[c];
+  where.fillStyle = tetroColors[minoType];
   where.fillRect(px, py, blockSize, blockSize);
 
   where.strokeStyle = "black";
 
-  if (c == 0) {
+  if (minoType == 0) {
     // 着地点
     ctx.setLineDash([2, 2]);
   } else {
