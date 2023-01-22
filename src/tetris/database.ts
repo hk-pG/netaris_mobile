@@ -1,50 +1,56 @@
-"use strict";
+import { System } from "./System";
+import { collection, addDoc } from "firebase/firestore";
+import { db, doc } from "./firebase";
 
-// **************************************************************** 4. database.js ****************************************************************
-console.log("remove judge var number ");
+export const setSubmitScore = () => {
+  const userName = document.getElementById("userName") as HTMLInputElement;
+  const form = document.querySelector("form") as HTMLFormElement;
 
-// @ts-expect-error TS(2304): Cannot find name 'firebase'.
-const db = firebase.firestore();
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
 
-const scores = db.collection("scores");
-const userName = document.getElementById("userName");
-const form = document.querySelector("form");
+    if (System.score > 0) {
+      //スコアが０点の情報はfirebaseにつなぐ前に弾く
 
-// @ts-expect-error TS(2531): Object is possibly 'null'.
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
+      const scores = collection(db, "scores");
 
-  if (
-    // score
-    0 > 0
-  ) {
-    //スコアが０点の情報はfirebaseにつなぐ前に弾く
+      addDoc(scores, {
+        name: userName,
+        score: System.score,
+      })
+        .then(() => {
+          console.log("successfully");
+          console.log(`userName is ${userName.value}`);
+          // console.log(`score is ${score}`);
+          setTimeout(() => {
+            document.location.reload();
+          }, 2500);
+        })
+        .catch((err: any) => {
+          console.error(err);
+        });
 
+      /*
     scores
-      // @ts-expect-error TS(2531): Object is possibly 'null'.
       .doc(userName.value)
       .set({
-        // @ts-expect-error TS(2531): Object is possibly 'null'.
         name: userName.value,
         // score: score,
       })
       .then(() => {
         console.log("successfully");
-        // @ts-expect-error TS(2531): Object is possibly 'null'.
         console.log(`userName is ${userName.value}`);
         // console.log(`score is ${score}`);
         setTimeout(() => {
           document.location.reload();
         }, 2500);
-      })
-      // @ts-expect-error TS(7006): Parameter 'err' implicitly has an 'any' type.
-      .catch((err) => {
-        console.log(err);
       });
-  } else {
-    document.location.reload();
-    //スコアが０点の場合は単純にリロードのみをする
-  }
-});
+      */
+    } else {
+      document.location.reload();
+      //スコアが０点の場合は単純にリロードのみをする
+    }
+  });
+};
 
 export {};
