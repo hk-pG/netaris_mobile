@@ -16,7 +16,10 @@ const handleMotionEvent = (event: DeviceMotionEvent): void => {
     console.log(event);
 
     const { x, y, z } = acceleration;
-    motion.innerText = `${x?.toFixed(3)} ${y?.toFixed(3)} ${z?.toFixed(3)}`;
+    const xyz = [x, y, z] as number[];
+    const arr = xyz.map((a) => a * 10).map((a) => a.toFixed(3));
+
+    motion.innerHTML = `${arr[0]} ${arr[1]} ${arr[2]}`;
   }
 };
 
