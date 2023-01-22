@@ -3,10 +3,12 @@ import "./style.css";
 import { getRandomNum } from "./functions/rand";
 import { Tetris } from "./Tetris";
 import { System } from "./System";
-import { gameController } from "./functions/gameController";
+import { gameController, setGyroMotion } from "./functions/gameController";
 import { bgImgContainer, canvas, holdView, next, openButton } from "./dom";
 import { Mino } from "./class/Mino";
 import { Position2d } from "./class/Position2d";
+import { setModal } from "./modal";
+import { setSubmitScore } from "./database";
 
 // ミノを構成する一つのブロックのサイズ
 export const blockSize = 30;
@@ -167,6 +169,10 @@ document.onkeydown = (e) => {
 document.onkeydown = (e) => {
   gameController(e.key);
 };
+
+setModal();
+setSubmitScore();
+setGyroMotion();
 
 tetris.startGame();
 

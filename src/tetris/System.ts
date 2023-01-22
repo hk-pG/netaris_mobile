@@ -9,7 +9,7 @@ export class System {
   private static isGameOvered: boolean = false;
   private static gameTurn: number = 0;
   public static score: number = 0;
-  public static gameId: number = 0;
+  public static gameId: NodeJS.Timer;
 
   constructor() {}
 

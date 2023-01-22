@@ -64,3 +64,21 @@ export const gameController = (key: string) => {
     }
   }
 };
+
+export const setGyroMotion = () => {
+  const debug = document.getElementById("debug")!;
+
+  const handleMotionEvent = (event: DeviceMotionEvent): void => {
+    console.info("Device motion event: " + event);
+    const acceleration = event.acceleration;
+
+    if (!!acceleration) {
+      console.log(event);
+
+      const { x, y, z } = acceleration;
+      debug.innerText = `${x} ${y} ${z}`;
+    }
+  };
+
+  window.addEventListener("devicemotion", handleMotionEvent, true);
+};
