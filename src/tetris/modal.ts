@@ -1,32 +1,26 @@
-"use strict";
-// **************************************************************** 3. modal.js ****************************************************************
+import { openButton } from "./dom";
+console.log("modal.ts");
 
-const mask = document.getElementById("mask");
-const modal = document.getElementById("modal");
-const close = document.getElementById("close");
+export const setModal = () => {
+  const mask = document.getElementById("mask");
+  const modal = document.getElementById("modal");
+  const close = document.getElementById("close");
 
-// @ts-expect-error TS(2531): Object is possibly 'null'.
-openButton.addEventListener("click", () => {
-  // @ts-expect-error TS(2531): Object is possibly 'null'.
-  mask.classList.remove("hidden");
-  // @ts-expect-error TS(2531): Object is possibly 'null'.
-  modal.classList.remove("hidden");
-});
+  openButton.addEventListener("click", () => {
+    console.log("open button clicked");
 
-// @ts-expect-error TS(2339): Property 'addEventListener' does not exist on type... Remove this comment to see the full error message
-close.addEventListener("click", () => {
-  // @ts-expect-error TS(2531): Object is possibly 'null'.
-  modal.classList.add("hidden");
-  // @ts-expect-error TS(2531): Object is possibly 'null'.
-  mask.classList.add("hidden");
-});
+    mask?.classList.remove("hidden");
+    modal?.classList.remove("hidden");
+  });
 
-// @ts-expect-error TS(2531): Object is possibly 'null'.
-mask.addEventListener("click", () => {
-  // @ts-expect-error TS(2531): Object is possibly 'null'.
-  modal.classList.add("hidden");
-  // @ts-expect-error TS(2531): Object is possibly 'null'.
-  mask.classList.add("hidden");
-});
+  close?.addEventListener("click", () => {
+    console.log("close button clicked");
+    modal?.classList.add("hidden");
+    mask?.classList.add("hidden");
+  });
 
-export {};
+  mask?.addEventListener("click", () => {
+    modal?.classList.add("hidden");
+    mask.classList.add("hidden");
+  });
+};
