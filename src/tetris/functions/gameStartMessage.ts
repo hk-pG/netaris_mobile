@@ -3,7 +3,7 @@ import { canvas, ctx } from "../dom";
 export const gameStartMessage = () => {
   ctx.beginPath();
   ctx.font = "bold 150% verdana";
-  let overMessage = "START TO 'SPACE'";
+  let overMessage = "START TO 'SPACE' or TAP";
   let w = ctx.measureText(overMessage).width;
   let x = canvas.width / 2 - w / 2;
   let y = canvas.height / 2 - w / 20;
