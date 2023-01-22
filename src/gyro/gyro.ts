@@ -8,19 +8,16 @@ const img = document.createElement("img");
 img.src = typescriptLogo;
 motion?.appendChild(img);
 
-const handleMotionEvent = (event: DeviceMotionEvent): void => {
-  console.info("Device motion event: " + event);
-  const acceleration = event.acceleration;
+window.addEventListener("load", () => {
+  window.addEventListener("deviceorientation", (e) => {
+    const a = e.absolute;
+    const z = e.alpha;
+    const x = e.beta;
+    const y = e.gamma;
 
-  if (!!acceleration && !!motion) {
-    console.log(event);
-
-    const { x, y, z } = acceleration;
-    const xyz = [x, y, z] as number[];
-    const arr = xyz.map((a) => a * 10).map((a) => a.toFixed(3));
-
-    motion.innerHTML = `${arr[0]} ${arr[1]} ${arr[2]}`;
-  }
-};
-
-window.addEventListener("devicemotion", handleMotionEvent, true);
+    if (!motion) return;
+    motion.innerHTML =
+      //
+      `z: ${z?.toFixed(3)} x: ${x?.toFixed(3)} y: ${y?.toFixed(3)}`;
+  });
+});
