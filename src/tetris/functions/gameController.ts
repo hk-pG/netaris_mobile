@@ -67,6 +67,8 @@ export const gameController = (key: string) => {
 
 export const phoneGameControls = () => {
   document.addEventListener("click", (e) => {
+    console.log(e);
+
     if (!System._isGameStarted) {
       // ゲーム開始
       System.startGame();
