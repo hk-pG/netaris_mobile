@@ -41,6 +41,7 @@ export class Tetris {
 
   // 初期化
   public init() {
+    console.clear();
     console.log("init");
 
     for (let y = 0; y < fieldRow; y++) {
@@ -125,7 +126,6 @@ export class Tetris {
   public drawNext() {
     for (let y = 0; y < tetroSize; y++) {
       for (let x = 0; x < tetroSize; x++) {
-        console.info(`next type is ${this.nextMino._type}`);
         if (this.nextMino._mino[y][x]) {
           // ntxにnextミノを描画する
           drawBlock(x, y, this.nextMino._type, ntx);
@@ -158,14 +158,15 @@ export class Tetris {
     //
     mx: number,
     my: number,
-    nextMino = this.currentMino._mino
+    nextMino = this.currentMino._mino,
+    pos: Position2d = this.currentPos
   ) {
     for (let y = 0; y < tetroSize; y++) {
       for (let x = 0; x < tetroSize; x++) {
         if (nextMino[y][x]) {
-          const { x: tetroX, y: tetroY } = this.currentPos.getPos();
-          let nx = tetroX + mx + x;
-          let ny = tetroY + my + y;
+          const { x: tetroX, y: tetroY } = pos.getPos();
+          const nx = tetroX + mx + x;
+          const ny = tetroY + my + y;
 
           if (
             ny < 0 ||
@@ -183,13 +184,16 @@ export class Tetris {
 
   /**
    *
-   * @param direction 0 or 1
-   * 0:時計回り
-   * 1:反時計回り
+   * @param direction 1 or -1
+   * 1:時計回り
+   * -1:反時計回り
    */
-  public rotateMino(direction: number) {
-    if (this.checkMove(0, 0, this.currentMino._mino)) {
+  public rotate(direction: number) {
+    const rotatedMino = this.currentMino.cloneMino();
+    rotatedMino.rotateMino(direction);
+    if (this.checkMove(0, 0, rotatedMino._mino)) {
       this.currentMino.rotateMino(direction);
+
       return true;
     }
 
@@ -209,17 +213,17 @@ export class Tetris {
         // 現在のミノの情報をまるまるホールドミノへこぴーする
         this.holdMino.changeMino(this.currentMino._type);
 
-        // createTetro();
         this.createTetris();
       } else {
         // ホールドしている -> 入れ替えをする
 
         // 現在のミノのタイプを記録し、後でホールドする
-        let beforeHoldType = this.currentMino._type;
+        const currentType = this.currentMino._type;
+        const holdingMinoType = this.holdMino._type;
 
-        this.currentMino.changeMino(beforeHoldType);
-        // holdType = beforeHoldType;
-        this.holdMino.changeMino(beforeHoldType);
+        // 保存したタイプを入れ替える
+        this.currentMino.changeMino(holdingMinoType);
+        this.holdMino.changeMino(currentType);
 
         // tetroX = startX;
         // tetroY = startY;

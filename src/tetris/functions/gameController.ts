@@ -43,10 +43,10 @@ export const gameController = (key: string) => {
         break;
       case "f" || "F":
         // Fキー
-        tetris.currentMino.rotateMino(0);
+        tetris.rotate(1);
         break;
       case "d" || "D":
-        tetris.currentMino.rotateMino(1);
+        tetris.rotate(-1);
         break;
       case Key.Space:
         // スペース

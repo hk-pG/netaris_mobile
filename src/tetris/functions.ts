@@ -13,9 +13,7 @@ import {
 } from "./index";
 
 const addScore = (lineCount: number) => {
-  console.log(`lineCount is ${lineCount}`);
   let add = (lineCount + Math.floor(lineCount / 2)) * 100;
-  console.log(add);
   const score = System.addScore(add);
   scoreView.innerText = `SCORE : ${score} P`;
 };
