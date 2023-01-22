@@ -10,7 +10,7 @@ motion?.appendChild(img);
 
 window.addEventListener("load", () => {
   window.addEventListener("deviceorientation", (e) => {
-    const a = e.absolute;
+    // const a = e.absolute;
     const z = e.alpha;
     const x = e.beta;
     const y = e.gamma;
