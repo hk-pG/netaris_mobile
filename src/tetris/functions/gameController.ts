@@ -99,25 +99,24 @@ export const setGyroMotion = () => {
 const gameControllerByMotion = (x: number, y: number, z: number) => {
   console.log(`x: ${x} y: ${y} z: ${z}`);
 
-  if (y === Math.max(x, y, z)) {
-    // 横移動
-    if (y < -20) {
-      // left
-      if (tetris.checkMove(-1, 0)) {
-        tetris.currentPos.moveLeft();
-      }
-    } else if (y > 20) {
-      // right
-      if (tetris.checkMove(1, 0)) {
-        tetris.currentPos.moveRight();
-      }
+  // 横移動
+  if (y < -20) {
+    // left
+    if (tetris.checkMove(-1, 0)) {
+      tetris.currentPos.moveLeft();
     }
-  } else if (x === Math.max(x, y, z)) {
-    if (x > 80) {
-      if (tetris.checkMove(0, 1)) {
-        // tetroY++;
-        tetris.currentPos.drop();
-      }
+  } else if (y > 20) {
+    // right
+    if (tetris.checkMove(1, 0)) {
+      tetris.currentPos.moveRight();
+    }
+  }
+
+  // 下
+  if (x > 80) {
+    if (tetris.checkMove(0, 1)) {
+      // tetroY++;
+      tetris.currentPos.drop();
     }
   }
 };
