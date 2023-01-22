@@ -76,6 +76,7 @@ export const phoneGameControls = () => {
       System.startGame();
     } else if (System._isGameStarted) {
       // 回転
+      tetris.rotate(1);
     } else if (System._isGameOvered) {
       // リスタート
       location.reload();
