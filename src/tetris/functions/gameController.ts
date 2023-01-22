@@ -69,6 +69,8 @@ export const phoneGameControls = () => {
   document.addEventListener("click", (e) => {
     console.log(e);
 
+    console.table([System._isGameStarted, System._isGameOvered]);
+
     if (!System._isGameStarted) {
       // ゲーム開始
       System.startGame();
@@ -94,6 +96,8 @@ export const setGyroMotion = () => {
 };
 
 const gameControllerByMotion = (x: number, y: number, z: number) => {
+  console.log(`x: ${x} y: ${y} z: ${z}`);
+
   if (y === Math.max(x, y, z)) {
     // 横移動
     if (y < -20) {
