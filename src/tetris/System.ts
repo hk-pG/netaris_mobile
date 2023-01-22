@@ -10,6 +10,7 @@ export class System {
   private static gameTurn: number = 0;
   public static score: number = 0;
   public static gameId: NodeJS.Timer;
+  public static deviceOrientation = { x: 0, y: 0, z: 0 };
 
   constructor() {}
 
