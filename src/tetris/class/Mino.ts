@@ -3,7 +3,6 @@ import { tetroSize, tetroTypes } from "..";
 export class Mino {
   private mino: number[][] = [];
   private type: number;
-  private rotation: number = 0;
 
   constructor(type: number) {
     this.type = type;
@@ -31,14 +30,15 @@ export class Mino {
 
   public cloneMino() {
     const newMino = new Mino(this.type);
-    newMino.setRotation(this.rotation);
+
+    newMino.mino = this.mino.map((y) => y.map((x) => x));
 
     return newMino;
   }
 
   public setRotation(rotations: number) {
     if (rotations < 0) {
-      rotations = 4 + rotations;
+      rotations = 4 - (rotations % 4);
     }
     for (let i = 0; i < rotations % 4; i++) {
       this.rotateMino(1);
@@ -54,11 +54,6 @@ export class Mino {
    * @returns
    */
   public rotateMino(rotateType: number): number[][] {
-    const before = this.rotation;
-    // this.rotation = Math.abs((this.rotation + rotateType) % 4);
-    this.rotation += rotateType;
-    console.log(`rotate : ${before} -> ${this.rotation}`);
-
     const rotatedMino: number[][] = [];
     for (let y = 0; y < tetroSize; y++) {
       rotatedMino[y] = [];
