@@ -1,6 +1,6 @@
 import { System } from "./System";
 import { collection, addDoc } from "firebase/firestore";
-import { db, doc } from "./firebase";
+import { db } from "./firebase";
 
 export const setSubmitScore = () => {
   const userName = document.getElementById("userName") as HTMLInputElement;
