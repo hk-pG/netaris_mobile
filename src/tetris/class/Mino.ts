@@ -31,12 +31,15 @@ export class Mino {
 
   public cloneMino() {
     const newMino = new Mino(this.type);
-    newMino.rotateMino(this.rotation);
+    newMino.setRotation(this.rotation);
 
     return newMino;
   }
 
   public setRotation(rotations: number) {
+    if (rotations < 0) {
+      rotations = 4 + rotations;
+    }
     for (let i = 0; i < rotations % 4; i++) {
       this.rotateMino(1);
     }

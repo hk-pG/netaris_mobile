@@ -158,12 +158,13 @@ export class Tetris {
     //
     mx: number,
     my: number,
-    nextMino = this.currentMino._mino,
+    nextMino = this.currentMino,
     pos: Position2d = this.currentPos
   ) {
+    const mino = nextMino._mino;
     for (let y = 0; y < tetroSize; y++) {
       for (let x = 0; x < tetroSize; x++) {
-        if (nextMino[y][x]) {
+        if (mino[y][x]) {
           const { x: tetroX, y: tetroY } = pos.getPos();
           const nx = tetroX + mx + x;
           const ny = tetroY + my + y;
@@ -191,7 +192,7 @@ export class Tetris {
   public rotate(direction: number) {
     const rotatedMino = this.currentMino.cloneMino();
     rotatedMino.rotateMino(direction);
-    if (this.checkMove(0, 0, rotatedMino._mino)) {
+    if (this.checkMove(0, 0, rotatedMino)) {
       this.currentMino.rotateMino(direction);
 
       return true;
