@@ -16,7 +16,7 @@ const handleMotionEvent = (event: DeviceMotionEvent): void => {
     console.log(event);
 
     const { x, y, z } = acceleration;
-    motion.innerText = `${x} ${y} ${z}`;
+    motion.innerText = `${x?.toFixed(3)} ${y?.toFixed(3)} ${z?.toFixed(3)}`;
   }
 };
 
