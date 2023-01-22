@@ -3,7 +3,6 @@
 
 const mask = document.getElementById("mask");
 const modal = document.getElementById("modal");
-// @ts-expect-error TS(2451): Cannot redeclare block-scoped variable 'close'.
 const close = document.getElementById("close");
 
 // @ts-expect-error TS(2531): Object is possibly 'null'.

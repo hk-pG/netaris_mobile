@@ -1,4 +1,4 @@
-import typescriptLogo from "./typescript.svg";
+import typescriptLogo from "../typescript.svg";
 
 console.log("センサーを使います");
 
