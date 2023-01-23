@@ -19,6 +19,10 @@ body {
   margin-top: 2em;
 }
 
+.mobile-score {
+  display: none;
+}
+
 .mini-canvas {
   background-color: rgba(138, 216, 86, 0.5);
 }
@@ -195,7 +199,23 @@ th {
 
 @media (max-width: 830px) {
   #canvas {
-    height: 90vh;
+    height: 85vh;
+  }
+
+  .main-canvas-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobile-score {
+    display: block;
+    background-color: rgba(94, 68, 68, 0.749);
+    color: white;
+    font-size: larger;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: bold;
+    padding: 5px;
+    margin: 5px;
   }
 
   /* 操作方法を表示しない */

@@ -157,14 +157,19 @@ export const startY = 0;
 openButton.style.display = "none";
 
 export const tetris = new Tetris(
-  new Mino(1),
-  new Mino(2),
+  new Mino(getRandomNum(1, 10)),
+  new Mino(getRandomNum(1, 10)),
   new Position2d(startX, startY),
   800
 );
 
 export const scoreView = document.getElementById("score") as HTMLElement;
 scoreView.innerText = `SCORE : ${System.score} P`;
+
+export const mobileScoreView = document.getElementById(
+  "mobile-score"
+) as HTMLElement;
+mobileScoreView.innerText = `SCORE : ${System.score} P`;
 
 document.onkeydown = (e) => {
   gameController(e.key);

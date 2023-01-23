@@ -6,6 +6,7 @@ import {
   blockSize,
   fieldCol,
   fieldRow,
+  mobileScoreView,
   scoreView,
   tetris,
   tetroColors,
@@ -16,6 +17,7 @@ const addScore = (lineCount: number) => {
   let add = (lineCount + Math.floor(lineCount / 2)) * 100;
   const score = System.addScore(add);
   scoreView.innerText = `SCORE : ${score} P`;
+  mobileScoreView.innerText = `SCORE : ${score} P`;
 };
 
 // ブロック一つを描画する
