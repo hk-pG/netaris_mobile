@@ -78,6 +78,10 @@ export const phoneGameControls = () => {
       // 回転
       tetris.rotate(1);
     }
+  });
+
+  document.addEventListener("dblclick", (e) => {
+    console.log(e);
 
     if (System._isGameOvered) {
       // リスタート
