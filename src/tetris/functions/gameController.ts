@@ -119,7 +119,7 @@ const gameControllerByMotion = (x: number, y: number, z: number) => {
   }
 
   // 下
-  if (x > 70) {
+  if (x > 65) {
     if (tetris.checkMove(0, 1)) {
       // tetroY++;
       tetris.currentPos.drop();
