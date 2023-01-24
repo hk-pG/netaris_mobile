@@ -157,8 +157,8 @@ export const startY = 0;
 openButton.style.display = "none";
 
 export const tetris = new Tetris(
-  new Mino(getRandomNum(1, 10)),
-  new Mino(getRandomNum(1, 10)),
+  new Mino(getRandomNum(1, 7)),
+  new Mino(getRandomNum(1, 7)),
   new Position2d(startX, startY),
   800
 );
